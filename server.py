@@ -84,3 +84,28 @@ class TupleSpaceServer:
             pass
         finally:
             sock.close()
+
+    def _print_stats_periodically(self):
+        while True:
+            time.sleep(10)
+            with self.lock:
+                n = len(self.tuple_space)
+                if n == 0:
+                    avg_tup = avg_k = avg_v = 0
+                else:
+                    ks = [len(x) for x in self.tuple_space.keys()]
+                    vs = [len(x) for x in self.tuple_space.values()]
+                    avg_k = sum(ks)/n
+                    avg_v = sum(vs)/n
+                    avg_tup = (sum(ks)+sum(vs))/n
+                print("\n===== Tuple Space Stats =====")
+                print(f"Tuples: {n}")
+                print(f"Avg tuple size: {avg_tup:.2f}")
+                print(f"Avg key size: {avg_k:.2f}")
+                print(f"Avg value size: {avg_v:.2f}")
+                print(f"Clients: {self.total_clients}")
+                print(f"Ops: {self.total_operations} | READ:{self.total_reads} GET:{self.total_gets} PUT:{self.total_puts}")
+                print(f"Errors: {self.total_errors}")
+                print("=============================\n")
+
+    
