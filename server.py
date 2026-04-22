@@ -117,3 +117,14 @@ class TupleSpaceServer:
         while True:
             conn, addr = s.accept()
             threading.Thread(target=self._handle_client, args=(conn,)).start()
+
+if __name__ == "__main__":
+    import sys
+    if len(sys.argv)!=2:
+        print("Usage: python server.py <port> (50000-59999)")
+        sys.exit(1)
+    port = int(sys.argv[1])
+    if not 50000<=port<=59999:
+        print("Port must be 50000~59999")
+        sys.exit(1)
+    TupleSpaceServer(port).start()
