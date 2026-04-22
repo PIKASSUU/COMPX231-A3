@@ -16,3 +16,20 @@ class TupleSpaceServer:
         # Start the statistics thread
         self.stats_thread = threading.Thread(target=self._print_stats_periodically, daemon=True)
         self.stats_thread.start()
+
+    def _parse_request(self, data: str):
+        if len(data) < 3:
+            return "", "", ""
+        msg_len = int(data[:3])
+        body = data[3:].strip()
+
+        if body.startswith('R '):
+            return 'READ', body[2:].strip(), ''
+        elif body.startswith('G '):
+            return 'GET', body[2:].strip(), ''
+        elif body.startswith('P '):
+            parts = body[2:].split(' ', 1)
+            key = parts[0] if parts else ''
+            val = parts[1] if len(parts) > 1 else ''
+            return 'PUT', key, val
+        return "", "", ""
