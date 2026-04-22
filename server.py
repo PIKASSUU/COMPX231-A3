@@ -69,3 +69,18 @@ class TupleSpaceServer:
                 self.total_errors += 1
                 res = "ERR invalid command"
             return f"{len(res):03d}{res}"
+        
+    def _handle_client(self, sock: socket.socket):
+        with self.lock:
+            self.total_clients += 1
+        try:
+            while True:
+                data = sock.recv(1024).decode().strip()
+                if not data: break
+                cmd, k, v = self._parse_request(data)
+                resp = self._process_request(cmd, k, v)
+                sock.send(resp.encode())
+        except:
+            pass
+        finally:
+            sock.close()
