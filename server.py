@@ -108,4 +108,12 @@ class TupleSpaceServer:
                 print(f"Errors: {self.total_errors}")
                 print("=============================\n")
 
-    
+    def start(self):
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        s.bind((self.host, self.port))
+        s.listen(10)
+        print(f"Server running on {self.host}:{self.port}")
+        while True:
+            conn, addr = s.accept()
+            threading.Thread(target=self._handle_client, args=(conn,)).start()
