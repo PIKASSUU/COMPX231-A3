@@ -33,3 +33,34 @@ class TupleSpaceServer:
             val = parts[1] if len(parts) > 1 else ''
             return 'PUT', key, val
         return "", "", ""
+    
+    def _process_request(self, cmd: str, key: str, val: str):
+        with self.lock:
+            self.total_operations += 1
+            if cmd == 'READ':
+                self.total_reads += 1
+                if key in self.tuple_space:
+                    res = f"OK ({key}, {self.tuple_space[key]}) read"
+                else:
+                    self.total_errors += 1
+                    res = f"ERR {key} does not exist"
+            elif cmd == 'GET':
+                self.total_gets += 1
+                if key in self.tuple_space:
+                    v = self.tuple_space.pop(key)
+                    res = f"OK ({key}, {v}) removed"
+                else:
+                    self.total_errors += 1
+                    res = f"ERR {key} does not exist"
+            elif cmd == 'PUT':
+                self.total_puts += 1
+                if key not in self.tuple_space:
+                    self.tuple_space[key] = val
+                    res = f"OK ({key}, {val}) added"
+                else:
+                    self.total_errors += 1
+                    res = f"ERR {key} already exists"
+            else:
+                self.total_errors += 1
+                res = "ERR invalid command"
+            return f"{len(res):03d}{res}"
