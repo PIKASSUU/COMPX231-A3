@@ -17,3 +17,31 @@ class TupleClient:
             s.send(pkt.encode())
             resp = s.recv(1024).decode().strip()
         return resp[3:] if len(resp)>=3 else resp
+    
+    def run_file(self, path):
+        try:
+            with open(path) as f: lines = f.readlines()
+        except:
+            print(f"File not found: {path}")
+            return
+        for line in lines:
+            line = line.strip()
+            if not line: continue
+            parts = line.split()
+            cmd = parts[0]
+            try:
+                if cmd == 'READ':
+                    k = parts[1]
+                    res = self._send('R', k)
+                    print(f"READ {k}: {res}")
+                elif cmd == 'GET':
+                    k = parts[1]
+                    res = self._send('G', k)
+                    print(f"GET {k}: {res}")
+                elif cmd == 'PUT':
+                    k = parts[1]
+                    v = ' '.join(parts[2:]) if len(parts)>=3 else ''
+                    res = self._send('P', k, v)
+                    print(f"PUT {k} {v}: {res}")
+            except:
+                print(f"Invalid line: {line}")
