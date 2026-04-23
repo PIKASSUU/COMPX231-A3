@@ -45,3 +45,9 @@ class TupleClient:
                     print(f"PUT {k} {v}: {res}")
             except:
                 print(f"Invalid line: {line}")
+
+if __name__ == "__main__":
+    if len(sys.argv)!=4:
+        print("Usage: python client.py <host> <port> <request.txt>")
+        sys.exit(1)
+    TupleClient(sys.argv[1], int(sys.argv[2])).run_file(sys.argv[3])
